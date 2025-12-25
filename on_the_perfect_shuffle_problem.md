@@ -314,6 +314,26 @@ cur=18 nxt=9   => stop; A[9]=a18
 
 Across the three cycles, every index in `{1,..,26}` is visited exactly once, so the total work is Θ(26) and the extra storage is just the single `temp`.
 
+### 9.2 Handling arbitrary `L` (not of the form `3^k - 1`)
+
+The “closed-form cycle leaders” trick in §8 is specific to the modulus `M = L+1 = 3^k`. If `L+1` is not a power of 3, then:
+
+1. `f(i) = 2i mod (L+1)` is **not** guaranteed to have the clean “one valuation = one cycle” structure, so we no longer have a constant-space way to enumerate cycle leaders.
+2. Padding up to `L' = 3^k - 1` generally **doesn’t preserve the permutation you wanted on the first `L` elements**: the perfect-shuffle permutation depends on the array’s true length, and the modular map you run at length `L'` will move items in `1..L` through positions `> L` before they come back.
+
+What does work (for the classic perfect shuffle on an array of length `2n`) is a **peel-off strategy**:
+
+- Choose the largest `k` such that `3^k - 1 ≤ 2n`. Let `m = (3^k - 1)/2`, so `2m` is the largest “good length” prefix we can handle immediately.
+- Use a rotation to rewrite
+  `[x1..xn, y1..yn]`
+  into
+  `[x1..xm, y1..ym, x_{m+1}..xn, y_{m+1}..yn]`.
+  Concretely (0-based), rotate the subarray `A[m : n+m]` left by `n-m` (equivalently: turn `[x_{m+1}..x_n, y_1..y_m]` into `[y_1..y_m, x_{m+1}..x_n]`).
+- Now the prefix of length `2m = 3^k - 1` is exactly a “special-size” instance, so apply the cycle-leader method there using modulus `2m+1 = 3^k`.
+- Recurse/iterate on the remaining suffix of length `2(n-m)`.
+
+This avoids padding entirely: you only ever apply the modular-cycle algorithm on prefixes whose length is exactly `3^k - 1`, and you use rotations to isolate such a prefix inside a larger problem.
+
 ---
 
 ## 10. Other Structured Permutations Solvable In-Place
