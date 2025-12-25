@@ -319,7 +319,7 @@ Across the three cycles, every index in `{1,..,26}` is visited exactly once, so 
 The “closed-form cycle leaders” trick in §8 is specific to the modulus `M = L+1 = 3^k`. If `L+1` is not a power of 3, then:
 
 1. `f(i) = 2i mod (L+1)` is **not** guaranteed to have the clean “one valuation = one cycle” structure, so we no longer have a constant-space way to enumerate cycle leaders.
-2. Padding up to `L' = 3^k - 1` generally **doesn’t preserve the permutation you wanted on the first `L` elements**: the perfect-shuffle permutation depends on the array’s true length, and the modular map you run at length `L'` will move items in `1..L` through positions `> L` before they come back.
+2. Padding up to `L' = 3^k - 1` generally **doesn’t preserve the permutation you wanted on the first `L` elements**: the map changes from mod `(L+1)` to mod `(L'+1)`, so indices in `1..L` can route through the padded region before returning, which mixes real elements with dummies.
 
 What does work (for the classic perfect shuffle on an array of length `2n`) is a **peel-off strategy**:
 
@@ -389,17 +389,3 @@ All allow explicit cycle leader enumeration.
 
 The perfect shuffle is a classic example:
 its underlying permutation has deep number-theoretic symmetry, making in-place application possible.
-
-```
-
----
-
-If you want, I can also:
-
-- Generate a PDF-formatted version,
-- Add diagrams,
-- Provide a deeper appendix about primitive roots, p-adic valuation, or cycle decomposition,
-- Or write pseudocode for the fully general in-place permutation engine.
-
-Just let me know!
-```
